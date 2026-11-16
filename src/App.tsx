@@ -1,12 +1,14 @@
-// ─── App: stage machine for the pack-opening ritual (~5.5 s) ───────────────
-// idle → (tap/drag tear, leak glows in the best card's colour) → burst
-// (flash + confetti + foil shreds, pack body drops) → fan (5 cards face-down)
-// → flips in ascending rarity, hero last with slow hang + rays + dim →
-// summary (points credited, collection committed) → open another.
+// ─── App: stage machine for the pack-opening ritual ────────────────────────
+// Pocket-style flow (rebuilt 2026-11-16, research: pokemon-pack-opening
+// report §5.1): idle = pack CAROUSEL (pick one of five) → pack stage (drag
+// across the top crimp to tear; light leaks the best card's colour) → burst
+// (flash + confetti + foil shreds, pack body drops) → reveal = a stack the
+// player flips through ONE card at a time, rarest last, legendary by
+// press-and-hold → summary (points credited, collection committed).
 //
-// The pack is ROLLED on first touch (so the leak colour is honest), CHARGED
-// on tear commit, and COMMITTED to the save only when the summary lands —
-// applyPackResult runs exactly once per pack.
+// The pack is ROLLED when it is picked (so the leak colour is honest),
+// CHARGED on tear commit, and COMMITTED to the save only when the summary
+// lands — applyPackResult runs exactly once per pack.
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { LazyMotion, domAnimation, AnimatePresence, m } from 'motion/react'
@@ -18,11 +20,14 @@ import { useGameStore, PACK_COST } from './store/useGameStore'
 import { STRINGS } from './i18n'
 import * as sfx from './audio/sfx'
 import { Pack } from './components/Pack'
+import { StackReveal } from './components/StackReveal'
 import { Fan } from './components/Fan'
 import { GachaCard } from './components/GachaCard'
 import { Collection } from './components/Collection'
 
-type Stage = 'idle' | 'burst' | 'fan' | 'summary'
+type Stage = 'idle' | 'pack' | 'burst' | 'reveal' | 'summary'
+
+const PACK_URL = `${import.meta.env.BASE_URL}pack.webp`
 
 const PALETTE = ['#ff7aa2', '#ffd166', '#3cb89a', '#6ebbe3', '#b9a0ff', '#ffffff']
 
@@ -90,11 +95,11 @@ export default function App() {
 
   const [stage, setStage] = useState<Stage>('idle')
   const [result, setResult] = useState<PackResult | null>(null)
-  const [flippedCount, setFlippedCount] = useState(0)
-  const [heroActive, setHeroActive] = useState(false)
   const [tearSignal, setTearSignal] = useState(0)
   const [burstKey, setBurstKey] = useState(0)
   const [showCollection, setShowCollection] = useState(false)
+  const [selIdx, setSelIdx] = useState(2)
+  const carDrag = useRef<{ x: number; moved: boolean }>({ x: 0, moved: false })
 
   const timers = useRef<number[]>([])
   const resultRef = useRef<PackResult | null>(null)
@@ -125,8 +130,6 @@ export default function App() {
     appliedRef.current = false
     preparedRef.current = true
     setResult(rolled)
-    setFlippedCount(0)
-    setHeroActive(false)
     // Preload the 5 faces during the tear — foil arriving late reads broken.
     rolled.pulls.forEach((p) => {
       const img = new Image()
@@ -144,34 +147,19 @@ export default function App() {
     setStage('summary')
   }
 
-  const heroFlip = (delay: number) => {
-    later(() => {
-      setFlippedCount(5)
-      setHeroActive(true)
-      if (resultRef.current) {
-        sfx.revealStinger(resultRef.current.bestTier)
-        const rgb = TIER_META[resultRef.current.bestTier].glow
-        fireConfetti([rgb, ...PALETTE], TIER_META[resultRef.current.bestTier].rank >= 3)
-      }
-    }, delay)
-    later(finishPack, delay + (reducedMotion ? 260 : 1350))
+  /** Epic/Legendary flip landed in the stack reveal — celebrate it. */
+  const handleBigReveal = (tier: Tier) => {
+    const glow = TIER_META[tier].glow
+    fireConfetti([glow, ...PALETTE], tier === 'legendary')
   }
 
-  const scheduleFlips = () => {
-    const step = reducedMotion ? 90 : 300
-    for (let i = 0; i < 4; i++) {
-      later(
-        () => {
-          setFlippedCount(i + 1)
-          sfx.flipTick(i)
-        },
-        step * (i + 1),
-      )
-    }
-    heroFlip(step * 4 + (reducedMotion ? 60 : 430))
+  /** Carousel pick: roll the pack, then move to the tear stage. */
+  const selectPack = (i: number) => {
+    setSelIdx(i)
+    if (preparePack()) setStage('pack')
   }
 
-  /** Tear committed (tap / drag / button): charge, burst, fan, reveal. */
+  /** Tear committed (drag / tap / button): charge, burst, then the stack. */
   const onCommitTear = () => {
     if (!resultRef.current) return
     creditPoints(-PACK_COST) // charge at commit; affordability was gated at prepare
@@ -179,8 +167,7 @@ export default function App() {
     setBurstKey((k) => k + 1)
     setStage('burst')
     fireConfetti([leak.glow, ...PALETTE])
-    later(() => setStage('fan'), reducedMotion ? 90 : 430)
-    later(scheduleFlips, reducedMotion ? 200 : 430 + 780)
+    later(() => setStage('reveal'), reducedMotion ? 90 : 460)
   }
 
   const onOpenButton = () => {
@@ -190,17 +177,9 @@ export default function App() {
   const skip = () => {
     if (stage === 'burst') {
       clearTimers()
-      setStage('fan')
-      setFlippedCount(4)
-      heroFlip(90)
-    } else if (stage === 'fan') {
-      clearTimers()
-      if (!heroActive && flippedCount < 5) {
-        setFlippedCount(4)
-        heroFlip(60)
-      } else {
-        finishPack()
-      }
+      setStage('reveal')
+    } else if (stage === 'reveal') {
+      finishPack()
     }
   }
 
@@ -209,8 +188,6 @@ export default function App() {
     resultRef.current = null
     preparedRef.current = false
     setResult(null)
-    setFlippedCount(0)
-    setHeroActive(false)
     setStage('idle')
   }
 
@@ -248,30 +225,74 @@ export default function App() {
           {stage === 'burst' && <div className="flash" key={burstKey} style={{ ['--flash' as string]: leak.glow }} />}
           {stage === 'burst' && <Shreds rgb={leak.glowRgb} burstKey={burstKey} />}
 
-          {(stage === 'idle' || stage === 'burst') && (
+          {stage === 'idle' && (
+            <div
+              className="carousel"
+              onPointerDown={(e) => {
+                carDrag.current = { x: e.clientX, moved: false }
+              }}
+              onPointerMove={(e) => {
+                if (carDrag.current.x && Math.abs(e.clientX - carDrag.current.x) > 12) carDrag.current.moved = true
+              }}
+              onPointerUp={(e) => {
+                const dx = e.clientX - carDrag.current.x
+                if (carDrag.current.moved) {
+                  if (dx < -45) setSelIdx((i) => Math.min(i + 1, 4))
+                  else if (dx > 45) setSelIdx((i) => Math.max(i - 1, 0))
+                }
+                carDrag.current.x = 0
+              }}
+            >
+              {[0, 1, 2, 3, 4].map((i) => {
+                const o = i - selIdx
+                return (
+                  <m.div
+                    key={i}
+                    className="car-pack"
+                    animate={{
+                      x: o * 118,
+                      rotate: o * 7,
+                      scale: 1 - Math.abs(o) * 0.14,
+                      opacity: Math.abs(o) === 2 ? 0.5 : 1,
+                    }}
+                    transition={{ type: 'spring', stiffness: 260, damping: 26 }}
+                    style={{ zIndex: 10 - Math.abs(o) }}
+                    onClick={() => {
+                      if (carDrag.current.moved) return
+                      if (i === selIdx) selectPack(i)
+                      else setSelIdx(i)
+                    }}
+                  >
+                    <img src={PACK_URL} alt="" draggable={false} />
+                  </m.div>
+                )
+              })}
+            </div>
+          )}
+
+          {(stage === 'pack' || stage === 'burst') && (
             <Pack
               leakColor={leak.glow}
               leakRgb={leak.glowRgb}
+              bigPack={leak.rank >= 3}
               phase={stage === 'burst' ? 'burst' : 'idle'}
               tearSignal={tearSignal}
               reducedMotion={reducedMotion}
-              interactive={stage === 'idle' && (canAfford || preparedRef.current)}
+              interactive={stage === 'pack' && (canAfford || preparedRef.current)}
               onFirstTouch={preparePack}
               onCommitTear={onCommitTear}
             />
           )}
 
-          {(stage === 'fan' || stage === 'summary') && result && (
-            <Fan
-              pulls={result.pulls}
-              flippedCount={stage === 'summary' ? 5 : flippedCount}
-              heroActive={stage === 'summary' ? false : heroActive}
-              reducedMotion={reducedMotion}
-              tilt={!reducedMotion}
-            />
+          {stage === 'reveal' && result && (
+            <StackReveal pulls={result.pulls} reducedMotion={reducedMotion} t={t} onBigReveal={handleBigReveal} onFinish={finishPack} />
           )}
 
-          {(stage === 'burst' || stage === 'fan') && (
+          {stage === 'summary' && result && (
+            <Fan pulls={result.pulls} flippedCount={5} heroActive={false} reducedMotion={reducedMotion} tilt={!reducedMotion} />
+          )}
+
+          {(stage === 'burst' || stage === 'reveal') && (
             <button className="btn btn-small skip-btn" onClick={skip}>
               {t.skip} ≫
             </button>
@@ -282,10 +303,10 @@ export default function App() {
           {stage === 'idle' &&
             (canAfford ? (
               <>
-                <button className="btn btn-primary" onClick={onOpenButton}>
+                <button className="btn btn-primary" onClick={() => selectPack(selIdx)}>
                   {t.openPack}（{t.packCost}）
                 </button>
-                <p className="hint">{t.tapHint}</p>
+                <p className="hint">{t.choosePack}</p>
               </>
             ) : (
               <>
@@ -301,6 +322,15 @@ export default function App() {
                 </button>
               </>
             ))}
+
+          {stage === 'pack' && (
+            <>
+              <button className="btn btn-primary" onClick={onOpenButton}>
+                {t.openPack}（{t.packCost}）
+              </button>
+              <p className="hint">{t.tapHint}</p>
+            </>
+          )}
 
           {stage === 'summary' && result && (
             <div className="summary">

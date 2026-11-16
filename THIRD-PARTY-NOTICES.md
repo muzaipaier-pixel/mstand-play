@@ -40,3 +40,11 @@ card scans, or other Nintendo assets are included in this project.
 The 27 drink card faces (`public/cards/`), the pack artwork
 (`public/pack.webp`), names and game text in this repository were created
 for this game and are released under the same GPL-3.0 license.
+
+## Pack-opening ritual design — pokeshell-arena (MIT)
+
+The pack-opening flow (carousel → horizontal zigzag tear → one-at-a-time
+stack reveal with per-tier presentation and a press-and-hold legendary
+reveal) follows the design documented in `docs/PACK_OPENING.md` of
+gshklovs/pokeshell-arena (MIT). Design reference only — all code here is an
+original React/Motion implementation written for this project.

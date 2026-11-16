@@ -14,7 +14,12 @@ export const STRINGS = {
     packCost: '50 pt',
     recharge: 'ポイント無料チャージ +200',
     notEnough: 'ポイントが足りません',
-    tapHint: 'パックをタップ、または上にドラッグで開封',
+    tapHint: 'パック上部を横にスワイプして切り開く（タップでも開封）',
+    choosePack: 'パックを選んでタップ',
+    holdReveal: '長押しでチャージ…',
+    tapReveal: 'タップでめくる',
+    nextHint: 'タップで次へ',
+    lastCard: 'ラスト1枚',
     skip: 'スキップ',
     result: '結果',
     pointsGained: '獲得ポイント',
@@ -48,7 +53,12 @@ export const STRINGS = {
     packCost: '50 pt',
     recharge: '免费充值 +200',
     notEnough: '积分不足',
-    tapHint: '点按卡包，或向上拖动撕开',
+    tapHint: '沿卡包顶部横向滑动撕开（点按也可）',
+    choosePack: '选一包，点它',
+    holdReveal: '长按蓄力揭晓…',
+    tapReveal: '点按翻开',
+    nextHint: '点按下一张',
+    lastCard: '最后一张',
     skip: '跳过',
     result: '结果',
     pointsGained: '获得积分',
@@ -73,4 +83,13 @@ export const STRINGS = {
   },
 } as const
 
-export type Strings = (typeof STRINGS)['ja']
+type JaStrings = (typeof STRINGS)['ja']
+
+/** Widened UI-string shape shared by both languages (ja literals → string). */
+export type Strings = {
+  [K in keyof JaStrings]: JaStrings[K] extends (...args: never[]) => unknown
+    ? JaStrings[K]
+    : JaStrings[K] extends Record<string, string>
+      ? Record<string, string>
+      : string
+}

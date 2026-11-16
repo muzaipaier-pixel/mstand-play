@@ -65,6 +65,17 @@ export function revealStinger(tier: Tier) {
   }
 }
 
+/** Rising sweep while the player press-and-holds to charge a legendary reveal. */
+export function chargeRiser() {
+  play([0.65, 0.05, 170, 0.04, 0.8, 0.18, 0, 1, 9.5, 0, 0, 0, 0, 0, 0, 0, 0, 0.9, 0.95, 0])
+  play([0.3, 0.2, 2400, 0.1, 0.7, 0.2, 4, 1, 4, 0, 0, 0, 0, 0.4, 0, 0, 0, 0.5, 0.9, 0])
+}
+
+/** Soft airy whoosh as a revealed card flies off to the tray. */
+export function whoosh() {
+  play([0.4, 0.35, 1100, 0, 0.04, 0.13, 4, 1, -7, 0, 0, 0, 0, 0, 0.2, 0, 0, 0, 0.55, 0.1, 0])
+}
+
 /** Two-note coin chirp for the free recharge / points credit. */
 export function coinChime() {
   play([0.55, 0.05, 987.77, 0, 0.07, 0.1, 0, 1.2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.9, 0.06, 0])

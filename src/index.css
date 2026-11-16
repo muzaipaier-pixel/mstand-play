@@ -96,10 +96,60 @@ button { font-family: inherit; }
 }
 .pack-strip img { width: 100%; display: block; }
 .pack-glare {
-  position: absolute; inset: 0; border-radius: 14px; pointer-events: none; mix-blend-mode: screen;
+  position: absolute; inset: 0; border-radius: 14px; pointer-events: none; mix-blend-mode: screen; z-index: 5;
   background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.30) 48%, transparent 62%);
   background-size: 250% 100%; animation: packSheen 2.8s ease-in-out infinite;
 }
+
+/* ── Pocket tear layers (2026-11-16) ────────────────────────────────────── */
+.pack { filter: drop-shadow(0 18px 22px rgba(0,0,0,.45)); }
+.pack-layer {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  border-radius: 14px; display: block; pointer-events: none;
+}
+.pack-leak {
+  position: absolute; top: 0; left: 0; height: 36%; z-index: 2;
+  filter: blur(5px); pointer-events: none; border-radius: 14px 0 0 0;
+}
+.pack-stripfly { z-index: 3; }
+.pack-peel { position: absolute; inset: 0; pointer-events: none; }
+.pack-silver {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(120deg, #eceaf4, #a9a9c4 40%, #f6f4fc 65%, #8f8fae);
+}
+.pack-tearline {
+  position: absolute; left: 4%; right: 4%; top: 26%; z-index: 1; pointer-events: none;
+  border-top: 2px dashed rgba(255,255,255,.45);
+}
+.pack-shaking { animation: packShake .13s linear infinite; }
+@keyframes packShake {
+  0% { transform: translate(0, 0); } 25% { transform: translate(1.4px, -1px); }
+  50% { transform: translate(-1.4px, 1px); } 75% { transform: translate(1px, 1.2px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* ── pack carousel ──────────────────────────────────────────────────────── */
+.carousel { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; touch-action: pan-y; }
+.car-pack { position: absolute; width: min(46vw, 172px); aspect-ratio: 700 / 1037; cursor: pointer; }
+.car-pack img {
+  width: 100%; height: 100%; object-fit: cover; border-radius: 12px; display: block;
+  box-shadow: 0 16px 34px rgba(0,0,0,.5); pointer-events: none;
+}
+
+/* ── stack reveal ───────────────────────────────────────────────────────── */
+.stackreveal { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.sr-card { width: min(60vw, 238px); cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; }
+.sr-pulse { animation: srPulse 1.1s ease-in-out infinite; border-radius: 14px; }
+@keyframes srPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(var(--srgb), 0); }
+  50% { box-shadow: 0 0 36px 8px rgba(var(--srgb), .55); }
+}
+.sr-count { position: absolute; top: 6px; left: 2px; font-weight: 900; font-size: 14px; color: #cfc4ee; }
+.sr-under { margin-top: 16px; min-height: 76px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.sr-hint { font-weight: 800; font-size: 14px; color: #efeaff; text-shadow: 0 2px 8px rgba(0,0,0,.55); }
+.charge-ring { display: block; }
+.sr-tray { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; }
+.sr-tray img { width: 34px; aspect-ratio: 63 / 88; object-fit: cover; border-radius: 5px; border: 1.5px solid rgba(255,255,255,.5); display: block; }
 @keyframes packSheen { 0% { background-position: 130% 0; } 55%, 100% { background-position: -70% 0; } }
 
 /* ── fan & cards ────────────────────────────────────────────────────────── */

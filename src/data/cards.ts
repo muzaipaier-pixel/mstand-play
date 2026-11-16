@@ -21,6 +21,7 @@ export interface CardDef {
 }
 
 const art = (id: number) => `${import.meta.env.BASE_URL}cards/${String(id).padStart(2, '0')}.webp`
+const art2 = (id: number) => `${import.meta.env.BASE_URL}cards2/${String(id).padStart(2, '0')}.webp`
 
 const T = (
   id: number,
@@ -29,7 +30,7 @@ const T = (
   tier: Tier,
 ): CardDef => ({ id, name, stars, tier, art: art(id) })
 
-export const CARDS: CardDef[] = [
+const SET1: CardDef[] = [
   T(1, 'Brown Sugar Boba', 3, 'epic'),
   T(2, 'Mango Pomelo Sago', 3, 'rare'),
   T(3, 'Cheese Foam 4Seasons', 2, 'uncommon'),
@@ -57,6 +58,14 @@ export const CARDS: CardDef[] = [
   T(25, 'Hibiscus Tea', 1, 'common'),
   T(26, 'Mix Berry Milk', 2, 'common'),
   T(27, 'Four Seasons Oolong', 1, 'common'),
+]
+
+// ─── Set 2: the cosmos holo set (owner-supplied 2026-11-16) ─────────────────
+// Same 27 drinks, same stars/tiers as Set 1 (Genesis), different art line.
+// Global collector numbering continues: Set 2 = ids 28–54 of 54.
+export const CARDS: CardDef[] = [
+  ...SET1,
+  ...SET1.map((c) => ({ ...c, id: c.id + 27, art: art2(c.id) })),
 ]
 
 export const CARD_BY_ID: Record<number, CardDef> = Object.fromEntries(

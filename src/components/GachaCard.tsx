@@ -82,6 +82,8 @@ interface Props {
   heroActive?: boolean
   /** face-down rarity tell: tier-coloured edge glow on the card back */
   tellGlow?: boolean
+  /** timed-tween flip (~0.5 s, hero keeps its edge-on hang) instead of the slow popover spring — for the one-at-a-time stack reveal */
+  swiftFlip?: boolean
   /** enable pointer tilt (post-flip only) */
   tilt?: boolean
   reducedMotion?: boolean
@@ -96,6 +98,7 @@ export const GachaCard = memo(function GachaCard({
   hero = false,
   heroActive = false,
   tellGlow = false,
+  swiftFlip = false,
   tilt = false,
   reducedMotion = false,
   small = false,
@@ -124,6 +127,8 @@ export const GachaCard = memo(function GachaCard({
 
   const rafId = useRef<number | null>(null)
   const lastTime = useRef(0)
+  /** swiftFlip tween: deterministic timed flip (the popover spring takes seconds to settle) */
+  const flipTween = useRef<{ from: number; to: number; t0: number; dur: number; next?: { to: number; delay: number; dur: number } } | null>(null)
 
   const writeVars = () => {
     const el = rootRef.current
@@ -155,7 +160,25 @@ export const GachaCard = memo(function GachaCard({
     const dt = Math.min(Math.max((now - lastTime.current) / 1000, 1 / 240), 1 / 20)
     lastTime.current = now
     let alive = false
+    const tw = flipTween.current
+    if (tw) {
+      const p = Math.min(Math.max((now - tw.t0) / tw.dur, 0), 1)
+      const e = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2
+      sp.deltaX.value = tw.from + (tw.to - tw.from) * e
+      sp.deltaX.last = sp.deltaX.value
+      sp.deltaX.target = tw.to
+      alive = true
+      if (p >= 1) {
+        if (tw.next) {
+          flipTween.current = { from: tw.to, to: tw.next.to, t0: now + tw.next.delay, dur: tw.next.dur }
+          sp.deltaX.value = tw.to
+        } else {
+          flipTween.current = null
+        }
+      }
+    }
     for (const key of Object.keys(sp) as (keyof Springs)[]) {
+      if (key === 'deltaX' && flipTween.current) continue
       alive = tickSpring(sp[key], dt) || alive
     }
     writeVars()
@@ -230,6 +253,19 @@ export const GachaCard = memo(function GachaCard({
         sp.deltaX.last = 0
         sp.deltaX.target = 0
         writeVars()
+        return
+      }
+      if (swiftFlip) {
+        // deterministic timed flip: ~0.46 s; the hero pauses edge-on first
+        flipTween.current = hero
+          ? { from: sp.deltaX.value, to: 92, t0: performance.now(), dur: 400, next: { to: 0, delay: 430, dur: 480 } }
+          : { from: sp.deltaX.value, to: 0, t0: performance.now(), dur: 460 }
+        setTargets(INTERACT, { glareX: 35, glareY: 30, glareO: hero ? 0.9 : 0.55 })
+        flashTimer.current = window.setTimeout(
+          () => setTargets(SNAP, { glareX: 50, glareY: 50, glareO: 0 }),
+          hero ? 1250 : 650,
+        )
+        wake()
         return
       }
       // foil flash so the reveal reads even before the guest touches the card

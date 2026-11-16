@@ -221,7 +221,7 @@ export default function App() {
           </button>
         </header>
 
-        <div className="stage">
+        <div className={`stage${stage === 'reveal' ? ' stage-tall' : ''}`}>
           {stage === 'burst' && <div className="flash" key={burstKey} style={{ ['--flash' as string]: leak.glow }} />}
           {stage === 'burst' && <Shreds rgb={leak.glowRgb} burstKey={burstKey} />}
 

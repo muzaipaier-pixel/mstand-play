@@ -32,7 +32,8 @@ interface Props {
 
 export function StackReveal({ pulls, reducedMotion, t, onBigReveal, onFinish }: Props) {
   const [idx, setIdx] = useState(0)
-  const [flipped, setFlipped] = useState(false)
+  /** which card index has been flipped — keyed by index so a new card never inherits the previous card's flipped state at mount */
+  const [flippedIdx, setFlippedIdx] = useState(-1)
   const [leaving, setLeaving] = useState(false)
   const [charge, setCharge] = useState(0)
   const [holding, setHolding] = useState(false)
@@ -48,10 +49,10 @@ export function StackReveal({ pulls, reducedMotion, t, onBigReveal, onFinish }: 
   const isLast = idx === pulls.length - 1
   const faceDown = meta.rank >= 2 || isLast
   const needsHold = pull.tier === 'legendary' && !reducedMotion
+  const flipped = flippedIdx === idx
   const shown = flipped || !faceDown
 
   useEffect(() => {
-    setFlipped(false)
     setLeaving(false)
     setCharge(0)
     setHolding(false)
@@ -70,7 +71,7 @@ export function StackReveal({ pulls, reducedMotion, t, onBigReveal, onFinish }: 
   const doFlip = () => {
     if (flipped || busy.current) return
     busy.current = true
-    setFlipped(true)
+    setFlippedIdx(idx)
     setFlashKey((k) => k + 1)
     if (meta.rank >= 2) {
       sfx.revealStinger(pull.tier)
@@ -78,9 +79,10 @@ export function StackReveal({ pulls, reducedMotion, t, onBigReveal, onFinish }: 
     } else {
       sfx.flipTick(idx)
     }
+    // block advancing until the flip has visually landed (hero flip ~1.3 s)
     window.setTimeout(() => {
       busy.current = false
-    }, 500)
+    }, isLast ? 1400 : 620)
   }
 
   const startHold = () => {
@@ -169,6 +171,7 @@ export function StackReveal({ pulls, reducedMotion, t, onBigReveal, onFinish }: 
           onPointerCancel={onPointerLeave}
         >
           <GachaCard
+            key={idx}
             card={card}
             flipped={shown}
             isNew={pull.isNew}
@@ -176,6 +179,7 @@ export function StackReveal({ pulls, reducedMotion, t, onBigReveal, onFinish }: 
             hero={isLast}
             heroActive={flipped && isLast}
             tellGlow={!shown && meta.rank >= 2}
+            swiftFlip
             tilt={shown && !reducedMotion}
             reducedMotion={reducedMotion}
           />
@@ -208,7 +212,7 @@ export function StackReveal({ pulls, reducedMotion, t, onBigReveal, onFinish }: 
           </>
         )}
         {!shown && !needsHold && <div className="sr-hint">{t.tapReveal}</div>}
-        {shown && <div className="sr-hint">{isLast ? t.tapReveal : t.nextHint}</div>}
+        {shown && <div className="sr-hint">{isLast ? t.resultHint : t.nextHint}</div>}
       </div>
 
       <div className="sr-tray" aria-hidden>

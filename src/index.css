@@ -75,7 +75,7 @@ button { font-family: inherit; }
 /* ── stage ──────────────────────────────────────────────────────────────── */
 .stage { position: relative; height: 436px; display: flex; align-items: center; justify-content: center; }
 .stage-tall { height: calc(min(64dvh, 560px) + 124px); }
-.skip-btn { position: absolute; top: 4px; right: 0; z-index: 60; }
+.skip-btn { position: absolute; bottom: 4px; right: 0; z-index: 60; }
 .flash {
   position: absolute; inset: -12%; z-index: 40; pointer-events: none; opacity: 0;
   background: radial-gradient(circle at 50% 42%, #fff 0%, var(--flash) 34%, transparent 68%);

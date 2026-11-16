@@ -18,7 +18,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { m, useMotionValue, useSpring, useTransform, animate } from 'motion/react'
 import { tearCrinkle } from '../audio/sfx'
 
-const PACK_URL = `${import.meta.env.BASE_URL}pack.webp`
+const PACK_URL = `${import.meta.env.BASE_URL}pack-cut.webp`
 const STRIP = 26 // tear line height, % of pack height
 const SEGS = 24
 
@@ -102,8 +102,6 @@ export function Pack({
   const silverOpacity = useTransform(progress, [0, 1], [0, 0.55])
   const leakOpacity = useTransform(progress, [0.03, 0.55], [0, 1])
   const leakWidth = useTransform(progress, (v) => `${Math.max(v * 100, 0).toFixed(1)}%`)
-  const haloScale = useTransform(progress, [0, 1], [0.75, 1.3])
-  const haloOpacity = useTransform(progress, [0.02, 0.5], [0, 0.9])
 
   const drag = useRef<{ x: number; t: number; active: boolean; lastCrinkle: number; width: number }>({
     x: 0,
@@ -211,14 +209,6 @@ export function Pack({
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
         >
-          <m.div
-            className="pack-halo"
-            style={{
-              opacity: haloOpacity,
-              scale: haloScale,
-              background: `radial-gradient(circle, rgba(${leakRgb},.85) 0%, rgba(${leakRgb},.25) 45%, transparent 68%)`,
-            }}
-          />
           {/* body: everything below the zigzag */}
           <img className="pack-layer" src={PACK_URL} alt="" draggable={false} style={{ clipPath: bodyClip }} />
           {/* light leaking along the cut, as far as the tear has run */}

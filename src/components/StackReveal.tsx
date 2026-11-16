@@ -148,8 +148,8 @@ export function StackReveal({ pulls, reducedMotion, t, onBigReveal, onFinish }: 
       <AnimatePresence mode="popLayout">
         <m.div
           key={idx}
-          className={`sr-card${!shown && meta.rank >= 3 ? ' sr-pulse' : ''}`}
-          style={{ ['--srgb' as string]: meta.glowRgb }}
+          className="sr-card"
+          style={{ ['--srgb' as string]: meta.glowRgb, aspectRatio: card.ratio }}
           initial={{ y: 120, scale: 0.78, opacity: 0, rotate: 0 }}
           animate={
             leaving
@@ -217,7 +217,12 @@ export function StackReveal({ pulls, reducedMotion, t, onBigReveal, onFinish }: 
 
       <div className="sr-tray" aria-hidden>
         {pulls.slice(0, idx + (leaving ? 1 : 0)).map((p, j) => (
-          <img key={j} src={CARD_BY_ID[p.cardId].art} alt="" />
+          <img
+            key={j}
+            src={CARD_BY_ID[p.cardId].art}
+            alt=""
+            style={{ aspectRatio: CARD_BY_ID[p.cardId].ratio }}
+          />
         ))}
       </div>
     </div>

@@ -18,6 +18,9 @@ export interface CardDef {
   stars: 1 | 2 | 3
   tier: Tier
   art: string
+  /** native art aspect ratio (width / height) — cards are NEVER stretched:
+      Set 1 art is 750×1050 (0.7143), Set 2 art is 171×354 (0.4831) */
+  ratio: number
 }
 
 const art = (id: number) => `${import.meta.env.BASE_URL}cards/${String(id).padStart(2, '0')}.webp`
@@ -28,7 +31,7 @@ const T = (
   name: string,
   stars: 1 | 2 | 3,
   tier: Tier,
-): CardDef => ({ id, name, stars, tier, art: art(id) })
+): CardDef => ({ id, name, stars, tier, art: art(id), ratio: 750 / 1050 })
 
 const SET1: CardDef[] = [
   T(1, 'Brown Sugar Boba', 3, 'epic'),
@@ -65,7 +68,7 @@ const SET1: CardDef[] = [
 // Global collector numbering continues: Set 2 = ids 28–54 of 54.
 export const CARDS: CardDef[] = [
   ...SET1,
-  ...SET1.map((c) => ({ ...c, id: c.id + 27, art: art2(c.id) })),
+  ...SET1.map((c) => ({ ...c, id: c.id + 27, art: art2(c.id), ratio: 171 / 354 })),
 ]
 
 export const CARD_BY_ID: Record<number, CardDef> = Object.fromEntries(

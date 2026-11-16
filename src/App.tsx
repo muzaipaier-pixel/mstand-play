@@ -27,7 +27,7 @@ import { Collection } from './components/Collection'
 
 type Stage = 'idle' | 'pack' | 'burst' | 'reveal' | 'summary'
 
-const PACK_URL = `${import.meta.env.BASE_URL}pack.webp`
+const PACK_URL = `${import.meta.env.BASE_URL}pack-cut.webp`
 
 const PALETTE = ['#ff7aa2', '#ffd166', '#3cb89a', '#6ebbe3', '#b9a0ff', '#ffffff']
 
@@ -197,7 +197,6 @@ export default function App() {
   return (
     <LazyMotion features={domAnimation}>
       <div className={`app${reducedMotion ? ' reduced-motion' : ''}`}>
-        <div className="bg-stars" aria-hidden />
         <header className="topbar">
           <div className="logo">
             M STAND

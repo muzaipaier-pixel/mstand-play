@@ -2,7 +2,10 @@
    Everything the vendored library assumes about Pokémon cards that does not
    hold for our drink cards is adjusted HERE, so the upstream files stay
    pristine:
-   1. Aspect: Pokémon cards are 0.718; our card art is 640×948 → 0.6752.
+   1. Aspect: Pokémon cards are 0.718; our art differs PER SET — Set 1 is
+      750×1050 → 0.7143, Set 2 is 171×354 → 0.4831. GachaCard sets
+      --card-aspect inline per card (from CardDef.ratio); the :root value
+      below is only the pre-inline default. Nothing is ever stretched.
    2. Full-bleed art: a Pokémon card's holo is clipped to its illustration
       window (--clip). Our cards are art edge-to-edge, so the "window" is
       the whole card — every clip var becomes a full-cover shape.
@@ -13,7 +16,7 @@
 */
 
 :root {
-  --card-aspect: 0.6752; /* 640 / 948 */
+  --card-aspect: 0.7143; /* default = Set 1 (750 / 1050); GachaCard overrides per card */
 }
 
 .card {

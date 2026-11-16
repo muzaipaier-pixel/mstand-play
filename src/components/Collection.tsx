@@ -1,10 +1,12 @@
 // ─── Collection drawer: the binder, grouped by set (54 cards) ──────────────
-// Owned cards show in colour with a ×count badge; missing cards are numbered
-// navy silhouettes. Static mini faces (no tilt) — the full holo treatment is
-// reserved for the focused reveal, per the research performance rules.
+// Owned cards show in colour with a ×count badge; missing cards are quiet
+// sunken grooves in the card's own shape — no numbers, no dashed frames
+// (Pocket's binder rule). Static mini faces (no tilt) — the full holo
+// treatment is reserved for the focused reveal, per the research rules.
+// Each slot follows its own set's native art ratio (Set 1 0.714, Set 2 0.483).
 
 import { m } from 'motion/react'
-import { CARDS, TIER_META } from '../data/cards'
+import { CARDS } from '../data/cards'
 import { useGameStore } from '../store/useGameStore'
 import { STRINGS } from '../i18n'
 
@@ -43,19 +45,24 @@ export function Collection({ onClose }: { onClose: () => void }) {
           <div className="binder">
             {group.cards.map((card) => {
               const entry = collection[card.id]
-              const meta = TIER_META[card.tier]
               return entry ? (
-                <div key={card.id} className="slot owned" title={card.name}>
+                <div
+                  key={card.id}
+                  className="slot owned"
+                  title={card.name}
+                  style={{ aspectRatio: card.ratio }}
+                >
                   <img src={card.art} alt={card.name} loading="lazy" draggable={false} />
-                  <span className="slot-stars" style={{ color: meta.glow }}>
-                    {'★'.repeat(card.stars)}
-                  </span>
+                  <span className="slot-stars">{'★'.repeat(card.stars)}</span>
                   {entry.count > 1 && <span className="slot-count">×{entry.count}</span>}
                 </div>
               ) : (
-                <div key={card.id} className="slot missing" title={card.name}>
-                  <span>{card.id}</span>
-                </div>
+                <div
+                  key={card.id}
+                  className="slot missing"
+                  title={card.name}
+                  style={{ aspectRatio: card.ratio }}
+                />
               )
             })}
           </div>

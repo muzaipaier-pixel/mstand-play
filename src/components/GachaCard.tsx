@@ -293,6 +293,15 @@ export const GachaCard = memo(function GachaCard({
     [],
   )
 
+  /* the card box follows THIS card's native art ratio (Set 1 750×1050,
+     Set 2 171×354) — the vendored library sizes .card, the rotator and every
+     face layer from --card-aspect, so one inline var keeps front/back/foil
+     in the same undistorted box */
+  const aspectStyle = useMemo(
+    () => ({ '--card-aspect': card.ratio }) as React.CSSProperties,
+    [card.ratio],
+  )
+
   /* per-card random foil seed (upstream staticStyles) */
   const seedStyle = useMemo(() => {
     const sx = Math.random()
@@ -320,6 +329,7 @@ export const GachaCard = memo(function GachaCard({
         data-subtypes="basic"
         data-supertype="drink"
         ref={rootRef}
+        style={aspectStyle}
       >
         <div className="card__translater">
           <div className="card__rotator" onPointerMove={interact} onPointerLeave={interactEnd}>

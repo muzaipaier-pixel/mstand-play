@@ -1,4 +1,4 @@
-// ─── Collection drawer: the 27-card binder ──────────────────────────────────
+// ─── Collection drawer: the binder, grouped by set (54 cards) ──────────────
 // Owned cards show in colour with a ×count badge; missing cards are numbered
 // navy silhouettes. Static mini faces (no tilt) — the full holo treatment is
 // reserved for the focused reveal, per the research performance rules.
@@ -25,7 +25,7 @@ export function Collection({ onClose }: { onClose: () => void }) {
     >
       <div className="drawer-head">
         <h2>
-          {t.collection} — {t.owned} {owned} / 27
+          {t.collection} — {t.owned} {owned} / {CARDS.length}
         </h2>
         <button className="btn btn-small" onClick={onClose}>
           {t.close}
@@ -34,25 +34,33 @@ export function Collection({ onClose }: { onClose: () => void }) {
       <p className="drawer-sub">
         {t.packsOpened}: {stats.packsOpened}
       </p>
-      <div className="binder">
-        {CARDS.map((card) => {
-          const entry = collection[card.id]
-          const meta = TIER_META[card.tier]
-          return entry ? (
-            <div key={card.id} className="slot owned" title={card.name}>
-              <img src={card.art} alt={card.name} loading="lazy" draggable={false} />
-              <span className="slot-stars" style={{ color: meta.glow }}>
-                {'★'.repeat(card.stars)}
-              </span>
-              {entry.count > 1 && <span className="slot-count">×{entry.count}</span>}
-            </div>
-          ) : (
-            <div key={card.id} className="slot missing" title={card.name}>
-              <span>{card.id}</span>
-            </div>
-          )
-        })}
-      </div>
+      {[
+        { label: 'SET 1 · GENESIS', cards: CARDS.filter((c) => c.id <= 27) },
+        { label: 'SET 2 · COSMOS', cards: CARDS.filter((c) => c.id > 27) },
+      ].map((group) => (
+        <div key={group.label}>
+          <div className="binder-set">{group.label}</div>
+          <div className="binder">
+            {group.cards.map((card) => {
+              const entry = collection[card.id]
+              const meta = TIER_META[card.tier]
+              return entry ? (
+                <div key={card.id} className="slot owned" title={card.name}>
+                  <img src={card.art} alt={card.name} loading="lazy" draggable={false} />
+                  <span className="slot-stars" style={{ color: meta.glow }}>
+                    {'★'.repeat(card.stars)}
+                  </span>
+                  {entry.count > 1 && <span className="slot-count">×{entry.count}</span>}
+                </div>
+              ) : (
+                <div key={card.id} className="slot missing" title={card.name}>
+                  <span>{card.id}</span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      ))}
     </m.div>
   )
 }

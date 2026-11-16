@@ -273,7 +273,7 @@ button { font-family: inherit; }
 .binder { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
 .slot { aspect-ratio: 640 / 948; border-radius: 7px; overflow: hidden; position: relative; background: #241549; box-shadow: 0 4px 10px rgba(0,0,0,.35); }
 .slot img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.slot.missing { background: rgba(255,255,255,.04); color: #6f5da8; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 16px; border: 1.5px dashed rgba(141,127,192,.4); box-shadow: none; }
+.slot.missing { background: rgba(255,255,255,.05); color: #a794e0; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 16px; border: 1.5px dashed rgba(141,127,192,.4); box-shadow: none; }
 .slot-stars { position: absolute; left: 4px; top: 2px; font-size: 9px; text-shadow: 0 1px 3px rgba(0,0,0,.7); }
 .slot-count { position: absolute; right: 3px; bottom: 3px; background: rgba(0,0,0,.78); color: #fff; font-size: 10px; font-weight: 800; border-radius: 6px; padding: 1px 5px; }
 

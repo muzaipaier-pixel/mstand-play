@@ -1,0 +1,67 @@
+/* ─── Adapter: pokemon-cards-css → M Stand drink cards ──────────────────────
+   Everything the vendored library assumes about Pokémon cards that does not
+   hold for our drink cards is adjusted HERE, so the upstream files stay
+   pristine:
+   1. Aspect: Pokémon cards are 0.718; our card art is 640×948 → 0.6752.
+   2. Full-bleed art: a Pokémon card's holo is clipped to its illustration
+      window (--clip). Our cards are art edge-to-edge, so the "window" is
+      the whole card — every clip var becomes a full-cover shape.
+   3. The default CSS vars from Card.svelte's <style> block, scoped to
+      .card instead of :root so they cannot leak into the rest of the page.
+   4. Our card back is a styled <div> (upstream uses an <img>), so it needs
+      flex centering and its children exempted from the rotator's grid rules.
+*/
+
+:root {
+  --card-aspect: 0.6752; /* 640 / 948 */
+}
+
+.card {
+  /* defaults (Card.svelte <style>, scoped) */
+  --pointer-x: 50%;
+  --pointer-y: 50%;
+  --card-scale: 1;
+  --card-opacity: 0;
+  --translate-x: 0px;
+  --translate-y: 0px;
+  --rotate-x: 0deg;
+  --rotate-y: 0deg;
+  --background-x: var(--pointer-x);
+  --background-y: var(--pointer-y);
+  --pointer-from-center: 0;
+  --pointer-from-top: 0;
+  --pointer-from-left: 0;
+
+  /* full-bleed window (see note 2) */
+  --clip: inset(0% 0% 0% 0%);
+  --clip-invert: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+  --clip-stage: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+  --clip-stage-invert: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+  --clip-trainer: inset(0% 0% 0% 0%);
+  --clip-trainer-invert: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+  --clip-borders: inset(0% 0% 0% 0% round 4.55% / 3.5%);
+
+  width: 100%;
+}
+
+/* our card back: navy + gold M + star, drawn in CSS */
+.gcard .card__back {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: linear-gradient(150deg, #2a1a52, #3a2170 55%, #1d1138);
+  border: 3px solid #ffd166;
+}
+.card__back > * {
+  width: auto;
+  aspect-ratio: auto;
+  overflow: visible;
+}
+.back-m { font-size: 46px; font-weight: 900; color: #ffd166; line-height: 1; text-shadow: 0 3px 0 rgba(0,0,0,.45); }
+.back-star { font-size: 19px; color: #fff; }
+.back-sub { font-size: 8px; letter-spacing: .32em; color: #cfc4ee; font-weight: 700; }
+.gcard--small .back-m { font-size: 22px; }
+.gcard--small .back-star { font-size: 10px; }
+.gcard--small .back-sub { display: none; }

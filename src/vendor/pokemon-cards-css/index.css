@@ -1,0 +1,15 @@
+/*
+ * pokemon-cards-css by simeydotme (Simon Goellner)
+ * https://github.com/simeydotme/pokemon-cards-css — GPL-3.0
+ * Vendored entry point: imports the upstream stylesheets in the same order
+ * as the upstream demo (vars → base → rarity variants). Only the variants
+ * this game uses are imported; the rest remain in ./css/cards/ for reference.
+ * Adaptations for this project live in src/styles/poke-adapter.css — the
+ * upstream files themselves are unmodified apart from attribution headers.
+ */
+@import './css/cards.css';
+@import './css/cards/base.css';
+@import './css/cards/regular-holo.css';
+@import './css/cards/reverse-holo.css';
+@import './css/cards/cosmos-holo.css';
+@import './css/cards/rainbow-holo.css';

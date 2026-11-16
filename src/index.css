@@ -1,0 +1,180 @@
+@import './vendor/pokemon-cards-css/index.css';
+@import './styles/poke-adapter.css';
+
+/* ─── M Stand drink-card gacha — styles ─────────────────────────────────────
+   Night-navy stage, chunky brand buttons (3px ink border + hard shadow).
+   Card foil/flip = the vendored pokemon-cards-css library (GPL-3.0, see
+   THIRD-PARTY-NOTICES.md), adapted in styles/poke-adapter.css. */
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+:root {
+  --ink: #17102a;
+  --navy: #1a1230;
+  --gold: #ffd166;
+  --pink: #ff7aa2;
+  --paper: #fff4e8;
+}
+html, body { background: #120b24; }
+body {
+  background: radial-gradient(120% 90% at 50% 0%, #2a1b4d 0%, var(--navy) 55%, #120b24 100%);
+  color: #fff;
+  font-family: "Hiragino Maru Gothic ProN", "Hiragino Sans", "Noto Sans JP", "PingFang SC", sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+button { font-family: inherit; }
+
+.app { max-width: 460px; margin: 0 auto; padding: 14px 14px 44px; position: relative; }
+.bg-stars {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    radial-gradient(2px 2px at 12% 22%, rgba(255,255,255,.55) 50%, transparent 51%),
+    radial-gradient(1.6px 1.6px at 78% 12%, rgba(255,255,255,.5) 50%, transparent 51%),
+    radial-gradient(2px 2px at 88% 38%, rgba(255,209,102,.5) 50%, transparent 51%),
+    radial-gradient(1.4px 1.4px at 30% 64%, rgba(255,255,255,.45) 50%, transparent 51%),
+    radial-gradient(1.8px 1.8px at 62% 82%, rgba(255,255,255,.4) 50%, transparent 51%),
+    radial-gradient(1.3px 1.3px at 45% 34%, rgba(255,122,162,.5) 50%, transparent 51%);
+}
+.app > *:not(.bg-stars) { position: relative; z-index: 1; }
+
+/* ── header ─────────────────────────────────────────────────────────────── */
+.topbar { display: flex; align-items: center; gap: 8px; }
+.logo { font-weight: 900; font-size: 15px; letter-spacing: .06em; color: var(--gold); line-height: 1.15; }
+.logo small { display: block; color: #cfc4ee; font-size: 10px; letter-spacing: .14em; font-weight: 700; }
+.wallet-chip {
+  margin-left: auto; background: #fff; color: var(--ink);
+  border: 3px solid var(--ink); border-radius: 999px; box-shadow: 3px 3px 0 var(--ink);
+  padding: 5px 13px; font-weight: 900; font-size: 15px;
+}
+.iconbtn {
+  background: #fff; color: var(--ink); border: 3px solid var(--ink); border-radius: 999px;
+  box-shadow: 3px 3px 0 var(--ink); width: 38px; height: 38px; font-size: 16px; font-weight: 900; cursor: pointer;
+}
+.iconbtn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+
+/* ── buttons ────────────────────────────────────────────────────────────── */
+.btn {
+  background: #fff; color: var(--ink); border: 3px solid var(--ink); border-radius: 999px;
+  box-shadow: 4px 4px 0 var(--ink); font-size: 16px; font-weight: 900; padding: 12px 26px; cursor: pointer;
+}
+.btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ink); }
+.btn-primary { background: var(--pink); }
+.btn-gold { background: var(--gold); }
+.btn-small { font-size: 13px; padding: 7px 15px; box-shadow: 3px 3px 0 var(--ink); }
+.btn-ghost { background: transparent; color: #cfc4ee; border-color: rgba(255,255,255,.35); box-shadow: none; font-size: 14px; padding: 9px 20px; }
+
+/* ── stage ──────────────────────────────────────────────────────────────── */
+.stage { position: relative; height: 412px; display: flex; align-items: center; justify-content: center; }
+.skip-btn { position: absolute; top: 4px; right: 0; z-index: 60; }
+.flash {
+  position: absolute; inset: -12%; z-index: 40; pointer-events: none; opacity: 0;
+  background: radial-gradient(circle at 50% 42%, #fff 0%, var(--flash) 34%, transparent 68%);
+  animation: flashA .55s ease-out forwards;
+}
+@keyframes flashA { 0% { opacity: 0; } 22% { opacity: .95; } 100% { opacity: 0; } }
+.shreds { position: absolute; left: 50%; top: 36%; z-index: 35; pointer-events: none; }
+.shred { position: absolute; display: block; border-radius: 2px; }
+
+/* ── pack ───────────────────────────────────────────────────────────────── */
+.pack-drop { display: flex; justify-content: center; }
+.pack-bob { animation: packBob 4s ease-in-out infinite; }
+.pack-bob.no-bob { animation: none; }
+@keyframes packBob { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-9px) rotate(1deg); } }
+.pack {
+  position: relative; width: min(62vw, 238px); aspect-ratio: 700 / 1037;
+  cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none;
+  transform: perspective(900px) rotateX(var(--prx, 0deg)) rotateY(var(--pry, 0deg));
+}
+.pack-img { width: 100%; height: 100%; object-fit: cover; border-radius: 14px; display: block; box-shadow: 0 18px 42px rgba(0,0,0,.5); }
+.pack-halo { position: absolute; inset: -28%; border-radius: 50%; filter: blur(10px); pointer-events: none; }
+.pack-mouth { position: absolute; top: 0; left: 0; right: 0; height: 27%; border-radius: 14px 14px 0 0; pointer-events: none; }
+.pack-stripfly { position: absolute; inset: 0; pointer-events: none; }
+.pack-strip {
+  position: absolute; top: 0; left: 0; right: 0; height: 27%; overflow: hidden;
+  border-radius: 14px 14px 4px 4px; transform-origin: 12% 0%;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,.35));
+}
+.pack-strip img { width: 100%; display: block; }
+.pack-glare {
+  position: absolute; inset: 0; border-radius: 14px; pointer-events: none; mix-blend-mode: screen;
+  background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.30) 48%, transparent 62%);
+  background-size: 250% 100%; animation: packSheen 2.8s ease-in-out infinite;
+}
+@keyframes packSheen { 0% { background-position: 130% 0; } 55%, 100% { background-position: -70% 0; } }
+
+/* ── fan & cards ────────────────────────────────────────────────────────── */
+.fan { position: absolute; inset: 0; }
+.fan-card { position: absolute; left: 50%; top: 45%; width: min(30vw, 132px); translate: -50% -50%; }
+.gcard { position: relative; width: 100%; isolation: isolate; }
+
+/* hero rays */
+.gcard-rays {
+  position: absolute; inset: -48%; border-radius: 50%; z-index: -1; pointer-events: none;
+  opacity: 0; transition: opacity .45s;
+  -webkit-mask-image: radial-gradient(circle, #000 26%, transparent 66%);
+  mask-image: radial-gradient(circle, #000 26%, transparent 66%);
+  animation: raysSpin 9s linear infinite;
+}
+.gcard-rays.on { opacity: 1; }
+@keyframes raysSpin { to { transform: rotate(360deg); } }
+
+.new-badge {
+  position: absolute; top: -9px; right: -9px; z-index: 6;
+  background: var(--pink); color: #fff; border: 2.5px solid var(--ink); border-radius: 999px;
+  font-size: 11px; font-weight: 900; padding: 2px 8px;
+  animation: badgePop .35s cubic-bezier(.3, 1.6, .5, 1) both;
+}
+@keyframes badgePop { from { transform: rotate(10deg) scale(0); } to { transform: rotate(10deg) scale(1); } }
+.pt-floater {
+  position: absolute; left: 50%; bottom: -13px; transform: translateX(-50%); z-index: 6; white-space: nowrap;
+  background: var(--ink); color: var(--gold); border: 2px solid var(--gold); border-radius: 999px;
+  font-size: 11px; font-weight: 900; padding: 2px 9px;
+  animation: floatUp 1.4s ease-out both;
+}
+@keyframes floatUp { 0% { opacity: 0; transform: translate(-50%, 7px); } 20% { opacity: 1; } 100% { opacity: 1; transform: translate(-50%, -3px); } }
+
+/* ── cta / summary ──────────────────────────────────────────────────────── */
+.cta { display: flex; flex-direction: column; align-items: center; gap: 10px; min-height: 98px; }
+.cta-spacer { height: 10px; }
+.hint { color: #a99ad6; font-size: 12px; text-align: center; }
+.hint.warn { color: #ff9db4; font-weight: 800; }
+.summary { text-align: center; }
+.summary-line { display: flex; gap: 16px; justify-content: center; align-items: baseline; font-weight: 800; color: #ffe9a8; margin-bottom: 12px; font-size: 15px; }
+.summary-line .gain { color: var(--gold); font-size: 21px; font-weight: 900; }
+.summary-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+/* ── odds sheet ─────────────────────────────────────────────────────────── */
+.odds {
+  margin-top: 16px; background: rgba(255,255,255,.05); border: 2px solid rgba(255,255,255,.14);
+  border-radius: 14px; padding: 10px 14px; color: #cfc4ee; font-size: 12px; line-height: 1.7;
+}
+.odds summary { cursor: pointer; font-weight: 900; color: #fff; font-size: 13px; }
+.odds ul { list-style: none; margin: 4px 0; }
+.odds-slot { color: #8d7fc0; }
+.odds-pity { color: #ffe9a8; font-weight: 700; }
+.foot { text-align: center; color: #7d6db0; font-size: 10px; margin-top: 16px; }
+
+/* ── collection drawer ─────────────────────────────────────────────────── */
+.drawer-wrap {
+  position: fixed; inset: 0; z-index: 400; display: flex; align-items: flex-end; justify-content: center;
+  background: rgba(8, 4, 18, .55);
+}
+.drawer {
+  background: #fff; color: var(--ink); width: min(460px, 100%); max-height: 84vh; overflow-y: auto;
+  border: 3px solid var(--ink); border-bottom: none; border-radius: 20px 20px 0 0; padding: 16px 16px 26px;
+}
+.drawer-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.drawer-head h2 { font-size: 16px; font-weight: 900; }
+.drawer-sub { font-size: 12px; color: #7a6a96; margin: 4px 0 12px; font-weight: 700; }
+.binder { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.slot { aspect-ratio: 640 / 948; border-radius: 7px; overflow: hidden; position: relative; background: #eee; }
+.slot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.slot.missing { background: #241549; color: #8d7fc0; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 16px; border: 2px dashed #4a367d; }
+.slot-stars { position: absolute; left: 4px; top: 2px; font-size: 9px; text-shadow: 0 1px 3px rgba(0,0,0,.7); }
+.slot-count { position: absolute; right: 3px; bottom: 3px; background: rgba(0,0,0,.78); color: #fff; font-size: 10px; font-weight: 800; border-radius: 6px; padding: 1px 5px; }
+
+/* ── reduced motion ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .pack-bob, .pack-glare, .gcard-rays { animation: none !important; }
+}
+.reduced-motion .pack-glare { animation: none; }

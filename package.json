@@ -1,0 +1,29 @@
+{
+  "description": "M Stand drink-card gacha (pack-opening) game — React + Vite + TypeScript",
+  "name": "mstand-gacha",
+  "private": true,
+  "scripts": {
+    "build": "tsc --noEmit && vite build",
+    "dev": "vite",
+    "preview": "vite preview"
+  },
+  "type": "module",
+  "version": "1.0.0",
+  "dependencies": {
+    "canvas-confetti": "^1.9.4",
+    "motion": "^14.14.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "zustand": "^5.1.0",
+    "zzfx": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/canvas-confetti": "^1.9.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.3.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8"
+  },
+  "license": "GPL-3.0-only"
+}
